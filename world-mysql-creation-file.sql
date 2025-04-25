@@ -5409,3 +5409,5 @@ SELECT c.Code, a.ObservationValue
 FROM abc a
 JOIN Country c ON a.ReferenceArea = c.Name
 ON DUPLICATE KEY UPDATE Expenditure = VALUES(Expenditure);
+
+drop table abc;
