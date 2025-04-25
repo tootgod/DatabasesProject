@@ -6,7 +6,7 @@ CREATE DATABASE IF NOT EXISTS world DEFAULT CHARSET = utf8;
 USE world;
 
 -- City table
-
+DROP TABLE IF EXISTS abc;
 DROP TABLE IF EXISTS City;
 CREATE TABLE City (
   ID INT(11) NOT NULL auto_increment,
@@ -5364,14 +5364,48 @@ COMMIT;
 
 
 CREATE TABLE Education (
-  Code CHAR(3) NOT NULL DEFAULT '',
-  Expenditure CHAR(52) default null,
+  CountryCode CHAR(3) NOT NULL DEFAULT '',
+  Expenditure Float(5,2) default null,
   MalePrimaryEnrollment FLOAT(3,2) default null,
   FemalePrimaryEnrollment FLOAT(3,2) default null,
   MaleSecondaryEnrollment FLOAT(3,2) default null,
   FemaleSecondaryEnrollment FLOAT(3,2) default null,
-  PRIMARY KEY  (Code),
-  FOREIGN KEY  (Code) references Country(Code)
+  PRIMARY KEY  (CountryCode),
+  FOREIGN KEY  (CountryCode) references Country(Code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into Education (Code) select Code from Country;
+
+CREATE TABLE abc (
+  ReferenceArea CHAR(52) default null,
+  TimePeriod int(4),
+  Sex text(65535) default null,
+  Agegroup CHAR(52) default null,
+  Unitsofmeasurement CHAR(52) default null,
+  ObservationValue float(5,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/expend2.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table abc
+drop column Sex,
+drop column Unitsofmeasurement,
+drop column Agegroup;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.ReferenceArea = ex.ReferenceArea
+  AND ex.TimePeriod > abc.TimePeriod;
+  
+alter table abc
+drop column TimePeriod;
+
+INSERT INTO Education (CountryCode, Expenditure)
+SELECT c.Code, a.ObservationValue
+FROM abc a
+JOIN Country c ON a.ReferenceArea = c.Name
+ON DUPLICATE KEY UPDATE Expenditure = VALUES(Expenditure);
