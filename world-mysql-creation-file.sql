@@ -5386,7 +5386,7 @@ CREATE TABLE abc (
   ObservationValue float(5,2) default null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/expend2.csv' INTO TABLE abc
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.2/Uploads/expend2.csv' INTO TABLE abc
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5414,6 +5414,7 @@ ON DUPLICATE KEY UPDATE Expenditure = VALUES(Expenditure);
 
 drop table abc;
 
+
 CREATE TABLE abc (
   ReferenceArea CHAR(52) default null,
   TimePeriod int(4),
@@ -5428,6 +5429,7 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES;
+
 
 alter table abc
 drop column Unitsofmeasurement,
@@ -5468,10 +5470,12 @@ CREATE TABLE abc (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/SecondarySchoolData.csv' INTO TABLE abc
+
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES;
+
 
 alter table abc
 drop column Unitsofmeasurement,
@@ -5516,6 +5520,7 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES;
 
+
 alter table abc
 drop column Unitsofmeasurement,
 drop column Agegroup;
@@ -5555,6 +5560,7 @@ CREATE TABLE abc (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/SecondarySchoolData.csv' INTO TABLE abc
+
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5598,6 +5604,7 @@ CREATE TABLE abc (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/PrimarySchoolData.csv' INTO TABLE abc
+
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5642,6 +5649,7 @@ CREATE TABLE abc (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/SecondarySchoolData.csv' INTO TABLE abc
+
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5674,3 +5682,225 @@ join abc a on a.ReferenceArea = (
 set e.FemaleSecondaryEnrollment = a.ObservationValue;
 
 drop table abc;
+
+drop table if exists Energy;
+drop table if exists def;
+CREATE TABLE Energy (
+  CountryCode CHAR(3) NOT NULL DEFAULT '',
+  Amount FLOAT(10,3) default null,
+  Type CHAR(20) not null default '',
+  PRIMARY KEY  (CountryCode,Type),
+  FOREIGN KEY  (CountryCode) references Country(Code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE def (
+  CountryorArea CHAR(52) default null,
+  CommodityTransaction CHAR(52),
+  Year INT(4),
+  Unit CHAR(50),
+  Quantity FLOAT(10,3),
+  QuantityFootnotes CHAR(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Nuclear.csv' INTO TABLE def
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.2/Uploads/Nuclear.csv' INTO TABLE def
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table def
+drop column QuantityFootnotes;
+
+DELETE def
+FROM def
+JOIN def AS ex
+  ON def.CountryorArea = ex.CountryorArea
+  AND ex.Year > def.Year;
+  
+alter table def
+drop column Year;
+
+INSERT INTO Energy (CountryCode, Amount, Type) 
+SELECT c.Code, a.Quantity,'Nuclear'
+FROM def a
+JOIN Country c ON a.CountryorArea = c.Name;
+
+drop table def;
+
+CREATE TABLE def (
+  CountryorArea CHAR(52) default null,
+  CommodityTransaction CHAR(52),
+  Year INT(4),
+  Unit CHAR(50),
+  Quantity FLOAT(10,3),
+  QuantityFootnotes CHAR(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Solar.csv' INTO TABLE def
+
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table def
+drop column QuantityFootnotes;
+
+DELETE def
+FROM def
+JOIN def AS ex
+  ON def.CountryorArea = ex.CountryorArea
+  AND ex.Year > def.Year;
+  
+alter table def
+drop column Year;
+
+INSERT INTO Energy (CountryCode, Amount, Type) 
+SELECT c.Code, a.Quantity,'Solar'
+FROM def a
+JOIN Country c ON a.CountryorArea = c.Name;
+
+drop table def;
+
+CREATE TABLE def (
+  CountryorArea CHAR(52) default null,
+  CommodityTransaction CHAR(72),
+  Year INT(4),
+  Unit CHAR(50),
+  Quantity FLOAT(10,3),
+  QuantityFootnotes CHAR(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Thermal.csv' INTO TABLE def
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table def
+drop column QuantityFootnotes;
+
+DELETE def
+FROM def
+JOIN def AS ex
+  ON def.CountryorArea = ex.CountryorArea
+  AND ex.Year > def.Year;
+  
+alter table def
+drop column Year;
+
+INSERT INTO Energy (CountryCode, Amount,Type) 
+SELECT c.Code, a.Quantity,'Thermal'
+FROM def a
+JOIN Country c ON a.CountryorArea = c.Name
+ON DUPLICATE KEY UPDATE Amount = VALUES(Amount);
+
+drop table def;
+
+CREATE TABLE def (
+  CountryorArea CHAR(52) default null,
+  CommodityTransaction CHAR(52),
+  Year INT(4),
+  Unit CHAR(50),
+  Quantity FLOAT(10,3),
+  QuantityFootnotes CHAR(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Ocean.csv' INTO TABLE def
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table def
+drop column QuantityFootnotes;
+
+DELETE def
+FROM def
+JOIN def AS ex
+  ON def.CountryorArea = ex.CountryorArea
+  AND ex.Year > def.Year;
+  
+alter table def
+drop column Year;
+
+INSERT INTO Energy (CountryCode, Amount,Type) 
+SELECT c.Code, a.Quantity, 'Ocean'
+FROM def a
+JOIN Country c ON a.CountryorArea = c.Name
+ON DUPLICATE KEY UPDATE Amount = VALUES(Amount);
+
+drop table def;
+
+CREATE TABLE def (
+  CountryorArea CHAR(52) default null,
+  CommodityTransaction CHAR(52),
+  Year INT(4),
+  Unit CHAR(50),
+  Quantity FLOAT(10,3),
+  QuantityFootnotes CHAR(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Wind.csv' INTO TABLE def
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table def
+drop column QuantityFootnotes;
+
+DELETE def
+FROM def
+JOIN def AS ex
+  ON def.CountryorArea = ex.CountryorArea
+  AND ex.Year > def.Year;
+  
+alter table def
+drop column Year;
+
+INSERT INTO Energy (CountryCode, Amount, Type) 
+SELECT c.Code, a.Quantity,'Wind'
+FROM def a
+JOIN Country c ON a.CountryorArea = c.Name
+ON DUPLICATE KEY UPDATE Amount = VALUES(Amount);
+
+drop table def;
+
+CREATE TABLE def (
+  CountryorArea CHAR(52) default null,
+  CommodityTransaction CHAR(52),
+  Year INT(4),
+  Unit CHAR(50),
+  Quantity FLOAT(10,3),
+  QuantityFootnotes CHAR(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Total.csv' INTO TABLE def
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+alter table def
+drop column QuantityFootnotes;
+
+DELETE def
+FROM def
+JOIN def AS ex
+  ON def.CountryorArea = ex.CountryorArea
+  AND ex.Year > def.Year;
+  
+alter table def
+drop column Year;
+
+INSERT INTO Energy (CountryCode, Amount, Type) 
+SELECT c.Code, a.Quantity,'Total'
+FROM def a
+JOIN Country c ON a.CountryorArea = c.Name
+ON DUPLICATE KEY UPDATE Amount = VALUES(Amount);
+
+drop table def;
+drop table def;
