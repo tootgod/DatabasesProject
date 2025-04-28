@@ -5386,7 +5386,7 @@ CREATE TABLE abc (
   ObservationValue float(5,2) default null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/expend2.csv' INTO TABLE abc
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.2/Uploads/expend2.csv' INTO TABLE abc
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5704,6 +5704,7 @@ CREATE TABLE def (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Nuclear.csv' INTO TABLE def
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.2/Uploads/Nuclear.csv' INTO TABLE def
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5738,6 +5739,7 @@ CREATE TABLE def (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Solar.csv' INTO TABLE def
+
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5900,4 +5902,5 @@ FROM def a
 JOIN Country c ON a.CountryorArea = c.Name
 ON DUPLICATE KEY UPDATE Amount = VALUES(Amount);
 
+drop table def;
 drop table def;
