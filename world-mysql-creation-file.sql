@@ -2,11 +2,13 @@
 -- mysql version
 -- as of 2019-04-17 bw
 
-CREATE DATABASE IF NOT EXISTS world DEFAULT CHARSET = utf8;
+CREATE DATABASE IF NOT EXISTS world DEFAULT CHARSET = utf8mb4;
 USE world;
 
 -- City table
 DROP TABLE IF EXISTS abc;
+drop table if exists Economy;
+drop table if exists Energy;
 DROP TABLE IF EXISTS City;
 CREATE TABLE City (
   ID INT(11) NOT NULL auto_increment,
@@ -5386,7 +5388,7 @@ CREATE TABLE abc (
   ObservationValue float(5,2) default null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.2/Uploads/expend2.csv' INTO TABLE abc
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/expend2.csv' INTO TABLE abc
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5704,7 +5706,6 @@ CREATE TABLE def (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Nuclear.csv' INTO TABLE def
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.2/Uploads/Nuclear.csv' INTO TABLE def
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
@@ -5903,4 +5904,204 @@ JOIN Country c ON a.CountryorArea = c.Name
 ON DUPLICATE KEY UPDATE Amount = VALUES(Amount);
 
 drop table def;
-drop table def;
+
+
+drop table if exists abc;
+drop table if exists Economy;
+
+CREATE TABLE Economy (
+  CountryCode CHAR(3) NOT NULL DEFAULT '',
+  CurrencyName Char(30) default null,
+  ExchangeRate FLOAT(7,2) default null,
+  Exports int(10) default null,
+  Imports int(10) default null,
+  UnemploymentRate FLOAT(3,1) default null,
+  GDPPerCapita Int(8) default null,
+  TouristArrivals int(10) default null,
+  TourismExpenditures int(10) default null,
+  PRIMARY KEY  (CountryCode),
+  FOREIGN KEY  (CountryCode) references Country(Code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  NationalCurrency CHAR(52) default null,
+  Value float(7,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/ExchangeRates.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+  
+INSERT INTO Economy (CountryCode, ExchangeRate, CurrencyName)
+SELECT c.Code, a.Value, a.NationalCurrency
+FROM abc a
+JOIN Country c ON a.Country = c.Name
+ON DUPLICATE KEY UPDATE CurrencyName = VALUES(CurrencyName);
+
+drop table abc;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  Value float(10,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Imports.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+
+update Economy e
+join abc a on a.Country = (
+	select Name from Country where Code = e.CountryCode
+)
+set e.Imports = a.Value;
+
+drop table abc;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  Value float(10,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Exports.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+
+update Economy e
+join abc a on a.Country = (
+	select Name from Country where Code = e.CountryCode
+)
+set e.Exports = a.Value;
+
+drop table abc;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  Value float(10,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Exports.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+
+update Economy e
+join abc a on a.Country = (
+	select Name from Country where Code = e.CountryCode
+)
+set e.GDPPerCapita = a.Value;
+
+drop table abc;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  Value float(10,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/TourismExpend.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+
+update Economy e
+join abc a on a.Country = (
+	select Name from Country where Code = e.CountryCode
+)
+set e.TourismExpenditures = a.Value;
+
+drop table abc;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  Value float(10,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/TourismArrivals.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+
+update Economy e
+join abc a on a.Country = (
+	select Name from Country where Code = e.CountryCode
+)
+set e.TouristArrivals = a.Value;
+
+drop table abc;
+
+CREATE TABLE abc (
+  Country CHAR(52) default null,
+  Year int(4),
+  Value float(10,2) default null
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/TourismArrivals.csv' INTO TABLE abc
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES;
+
+DELETE abc
+FROM abc
+JOIN abc AS ex
+  ON abc.Country = ex.Country
+  AND ex.Year > abc.Year;
+
+update Economy e
+join abc a on a.Country = (
+	select Name from Country where Code = e.CountryCode
+)
+set e.UnemploymentRate = a.Value;
+
+drop table abc;
