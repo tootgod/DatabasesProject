@@ -5368,12 +5368,12 @@ COMMIT;
 CREATE TABLE Education (
   CountryCode CHAR(3) NOT NULL DEFAULT '',
   Expenditure Float(5,2) default null,
-  TotalPrimaryEnrollment FLOAT(3,2) default null,
-  TotalSecondaryEnrollment FLOAT(3,2) default null,
-  MalePrimaryEnrollment FLOAT(3,2) default null,
-  MaleSecondaryEnrollment FLOAT(3,2) default null,
-  FemalePrimaryEnrollment FLOAT(3,2) default null,
-  FemaleSecondaryEnrollment FLOAT(3,2) default null,
+  TotalPrimaryEnrollment FLOAT(4,2) default null,
+  TotalSecondaryEnrollment FLOAT(4,2) default null,
+  MalePrimaryEnrollment FLOAT(4,2) default null,
+  MaleSecondaryEnrollment FLOAT(4,2) default null,
+  FemalePrimaryEnrollment FLOAT(4,2) default null,
+  FemaleSecondaryEnrollment FLOAT(4,2) default null,
   PRIMARY KEY  (CountryCode),
   FOREIGN KEY  (CountryCode) references Country(Code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -6086,7 +6086,7 @@ CREATE TABLE abc (
   Value float(10,2) default null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/TourismArrivals.csv' INTO TABLE abc
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Unemployment.csv' INTO TABLE abc
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
